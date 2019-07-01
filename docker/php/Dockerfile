@@ -18,8 +18,7 @@ RUN apk update \
     #&& curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
     && rm -rf /tmp/*
 
+COPY conf.d /usr/local/etc/php/
 CMD ["php-fpm", "-F"]
-
 WORKDIR /var/www
-
 EXPOSE 9000

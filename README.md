@@ -4,13 +4,14 @@ A simple LAMP Docker wrapper for Symfony 4 / Flex
 - L : Ubuntu desktop
 - A : Nginx http server
 - M : Mariadb database server
-- P : Php language
-- +phpmyadmin
-
+- P : Php 7.2 language
+including
+- HTTPS support
+- Xdebug support
+- PhpMyAdmin webapp
 
 Requisites
 -------------
-
   1. `sudo apt upgrade`
   1. `sudo apt update`
   1. `sudo apt install php7.2`
@@ -28,8 +29,7 @@ Requisites
   1. `sudo apt install composer`
   1. `sudo apt install docker-compose`
   1. `sudo apt install git`
-  1. `sudo apt install nano`
-  
+  1. `sudo apt install nano` 
   
 1 - Create symfony skelton
 ---------------------------
@@ -58,39 +58,16 @@ Requisites
 ---------------------------
   1. open app in a browser `localhost`
   1. open phpmyadmin in a browser `localhost:8080` and connect with user `root` and pass `root`
-  
-Make a CRUD page in 5 min
----------------------------
-  1. `php bin/console make:entity`
-  1. `php bin/console make:crud`
-  1. `php bin/console make:migration`
-  1. `php bin/console doctrine:migrations:migrate`
+  1. you can find docker volumes in /srv directory
    
-Fill with random data
----------------------------
-  1. `composer require --dev hautelook/alice-bundle `
-  1. `nano fixtures/client.yml`
-```html 
-App\Entity\Client:
-	client_{1..10}:
-		name: <name()>
-		birthday: <dateTime()>
-```
-  3. `php bin/console hautelook:fixtures:load`
-    
-Add functional test
----------------------------
-  1. `composer require --dev symfony/phpunit-bridge`
-  1. `php bin/console make:functional-test`
-  1. `nano tests/ClientTest.php`
-```html 
-$client = static::createClient();
-$crawler = $client->request('GET', '/client/');
-$this->assertSame(200, $client->getResponse()->getStatusCode());
-$this->assertContains('Client index', $crawler->filter('h1')->text());
-```
-  4. `./bin/phpunit`
-    
+More
+---------------------------  
+- [Make a CRUD page in 5 min](doc/CRUD.md) 
+- [Fill with random data](doc/FAKER.md) 
+- [Add functional test](doc/TEST.md) 
+- [Add Redis client](doc/REDIS.md) 
+- [Add JWT authentification](doc/JWT.md) 
+   
 Create your own repo from this directory !
 ---------------------------
   1. `git init`
