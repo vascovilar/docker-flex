@@ -3,44 +3,77 @@ version: '3.4'
 services:
     php:
         build: ./docker/php
+        container_name: php
+        user: ${UID}:${UID}
         volumes:
-            - ./:/var/www:rw
+            - ./app:/var/www:rw
         depends_on:
-            - db
+            - base
             - redis
+            - rabbit
     web:
         build: ./docker/web
+        container_name: web
         ports:
             - "80:80"
         volumes:
-            - ./:/var/www:ro
+            - ./app:/var/www:ro
         depends_on:
             - php
     proxy:
         # Don't use this proxy in prod
         build: ./docker/proxy
+        container_name: proxy
+        ports:
+            - "443:443"
         depends_on:
-          - web
-        ports:
-          - "443:443"
-    db :
+            - web
+    base:
         image: mariadb:latest
+        container_name: base
         environment:
-            MYSQL_ROOT_PASSWORD: root
-        ports:
-            - "3306:3306"
+            MYSQL_ROOT_PASSWORD: toto
         volumes:
             - /srv/mariadb:/var/lib/mysql
-    myadmin:
-        image: phpmyadmin/phpmyadmin
+        ports:
+            - "3306:3306"
+    admin_base:
+        image: phpmyadmin/phpmyadmin:latest
+        container_name: admin_base
         ports:
             - "8080:80"
+        environment:
+            - PMA_ARBITRARY=1
         depends_on:
-            - db
+            - base
     redis:
         image: redis:latest
+        container_name: redis
         command: ["redis-server", "--appendonly", "yes"]
-        ports:
-            - "6379:6379"
         volumes:
             - /srv/redis:/data
+        ports:
+            - "6379:6379"
+    admin_redis:
+        image: rediscommander/redis-commander:latest
+        container_name: admin_redis
+        environment:
+            REDIS_HOST: redis
+            REDIS_PORT: 6379
+            HTTP_USER: root
+            HTTP_PASSWORD: toto
+        ports:
+            - "8081:8081"
+        depends_on:
+            - redis
+    rabbit:
+        image: rabbitmq:management-alpine
+        container_name: rabbit
+        volumes:
+            - /srv/rabbitmq/:/var/lib/rabbitmq/
+        environment:
+            RABBITMQ_DEFAULT_USER: root
+            RABBITMQ_DEFAULT_PASS: toto
+        ports:
+            - "5672:5672"
+            - "15672:15672"
